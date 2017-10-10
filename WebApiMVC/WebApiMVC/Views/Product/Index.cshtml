@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewBag.Title = "Product";
+}
+
+<style type="text/css">
+    td {
+        background-color: #FFFFFF;
+        color: black;
+    }
+</style>
+<h2>Product Details</h2>
+<div align="center">
+
+    <table class="display table table-responsive tbl-base" cellpadding="0" cellspacing="0">
+        <thead style="font-weight: normal; text-transform: uppercase; text-align: left; background-color: #00BFFF; padding: 10px 5px; color: #fff;">
+            <tr class="btn-primary">
+                <th>Product_Id</th>
+                <th> Brand</th>
+                <th> DatePublished</th>
+                <th> ShortDescription</th>
+                <th> Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Cust in ViewBag.listProducts)
+            {
+                <tr class="btn-success">
+                    <td>
+                        <a href="@Url.Action("ReviewDetails","Review",new {id= Cust.Product_Id})">
+                            @Cust.Product_Id
+                        </a>
+                    </td>
+                    <td>
+                        @Cust.Brand
+                    </td>
+                    <td>
+                        @Cust.DatePublished.ToString("dd/MM/yyy")
+                    </td>
+                    <td>
+                        @Cust.ShortDescription
+                    </td>
+                    <td>
+                        @Cust.Title
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

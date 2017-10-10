@@ -1,0 +1,211 @@
+﻿@model IEnumerable<WebApiMVC.Models.ProductReview>
+@{
+    ViewBag.Title = "Reviews";
+}
+<h2> Review Details </h2>
+<div class="container">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Add Review</button><br /><br />
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title" id="myModalLabel">Add Review</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="EmployeeId">Product Id</label>
+                        <input type="text" class="form-control" id="Product_Id" placeholder="Product Id" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Age">User</label>
+                        <input type="text" class="form-control" id="User" placeholder="User" />
+                    </div>
+                    <div class="form-group">
+                        <label for="State">Comment</label>
+                        <input type="text" class="form-control" id="Comment" placeholder="Comment" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Country">Rating</label>
+                        <input type="text" class="form-control" id="Rating" placeholder="Rating" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnAdd">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+    .Comment {
+        color: black;
+    }
+
+    .Rating {
+        color: black;
+    }
+
+    td {
+        background-color: #FFFFFF;
+        color: black;
+    }
+</style>
+
+<div class="tab-details form-parent form-responsive">
+    <table id="table" class="display table table-responsive tbl-base" cellpadding="0" cellspacing="0">
+        <thead style="font-weight: normal; text-transform: uppercase; text-align: left; background-color: #337ab7; padding: 10px 5px; color: #fff;"">
+            <tr>
+                <th>Product_Id</th>
+                <th>Reviews_Id</th>
+                <th>User</th>
+                <th>Comment</th>
+                <th>Rating</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Cust in Model)
+            {
+                <tr class="btn-success">
+                    <td>
+                        @Html.DisplayFor(modelItem => Cust.Product_Id, new { id = "Product_Id" })
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Cust.Reviews_Id, new { id = "Reviews_Id" })
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Cust.User, new { id = "User" })
+                    </td>
+                    <td>
+                        @Html.TextAreaFor(item => Cust.Comment, new { @class = "Comment" })
+                    </td>
+                    <td>
+
+                        @Html.TextBoxFor(item => Cust.Rating, new { @class = "Rating" })
+                    </td>
+                    <td>
+                        <input type="submit" name="SubmitButton" value="Update" class="btnupdate btn-primary" />
+                        <input type="submit" name="SubmitButton" value="Delete" class="btndelete btn-danger" />
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    //function for Validating create review's record
+    function validate() {
+        var isValid = true;
+        if ($('#Product_Id').val().trim() == "") {
+            $('#Product_Id').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#Product_Id').css('border-color', 'lightgrey');
+        }
+        if ($('#User').val().trim() == "") {
+            $('#User').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#User').css('border-color', 'lightgrey');
+        }
+        if ($('#Comment').val().trim() == "") {
+            $('#Comment').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#Comment').css('border-color', 'lightgrey');
+        }
+        if ($('#Rating').val().trim() == "") {
+            $('#Rating').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#Rating').css('border-color', 'lightgrey');
+        }
+        return isValid;
+    }
+
+    //function for creating review's record
+    $("#btnAdd").click(function () {
+        var res = validate();
+        if (res == false) {
+            return false;
+        }
+        var empObj = {
+            Product_Id: $('#Product_Id').val(),
+            User: $('#User').val(),
+            Comment: $('#Comment').val(),
+            Rating: $('#Rating').val()
+        };
+        $.ajax({
+            url: "/Review/AddReview",
+            data: JSON.stringify(empObj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                alert("Product Review has been Added");
+            },
+            error: function (errormessage) {
+                alert("Product Review has been Added");
+                $('#myModal').modal('toggle');
+                $('#myModal').modal('hide');
+            }
+        });
+    });
+
+    //function for update review's record
+    $('.btnupdate').click(function () {
+        var Product_Id = $(this).closest("tr").find('td:eq(0)').text();
+        var Reviews_Id = $(this).closest("tr").find('td:eq(1)').text();
+        var User = $.trim($(this).closest("tr").find('td:eq(2)').text());;
+        var Comment = $.trim($(this).closest("tr").find('td:eq(3)').children().val());
+        var Rating = $.trim($(this).closest("tr").find('td:eq(4)').children().val());
+        if (Comment == null || Comment == "") {
+            alert("Please enter comment");
+        }
+        else {
+            $.ajax({
+                url: "/Review/Update",
+                type: "POST",
+                data: { Product_Id: Product_Id, Reviews_Id: Reviews_Id, User: User, Comment: Comment, Rating: Rating },
+                success: function (data) {
+                    alert("Updated successfully");
+                },
+                error: function (err) {
+                    alert("Updated1 successfully");
+                }
+            });
+        }
+    });
+
+
+    //function for deleting review's record
+    $('.btndelete').click(function () {
+        var Reviews_Id = $(this).closest("tr").find('td:eq(1)').text();
+        var ans = confirm("Are you sure you want to delete this Record?");
+        if (ans) {
+            $.ajax({
+                url: "/Review/Delete/" + Reviews_Id,
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    alert("Deleted successfully");
+                    location.reload();
+                },
+                error: function (errormessage) {
+                    alert("Deleted successfully");
+                    location.reload();
+                }
+            });
+        }
+    });
+</script>
